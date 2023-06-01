@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchBar from '../components/SearchBar';
 import CharacterCard from '../components/CharacterCard';
@@ -6,6 +7,7 @@ import CharacterCard from '../components/CharacterCard';
 export default function AllCharacters() {
     const [search, setSearch] = useState("")
     const [characters, setCharacters] = useState([])
+    const navigate = useNavigate()
 
     // fetches data for all characters once component mounts
     useEffect(() => {
@@ -16,18 +18,12 @@ export default function AllCharacters() {
         setSearch(event.target.value)
     }
 
-    // runs query for specific character search based on user input
-    function handleSearch() {
-        const searchUrl = `https://swapi.dev/api/people/?search=${search}`
-
-        axios.get(searchUrl)
-            .then(res => {
-                const character = res.data.results[0]
-                console.log(character)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+    // redirect to character search page if user searches for a character
+    function handleSearch(event) {
+        event.preventDefault()
+        if (search) {
+            navigate(`/character/${search}`)
+        }
     }
 
     // fetches data for all characters
@@ -54,6 +50,7 @@ export default function AllCharacters() {
             />
             {characters.map(character => (
                 <CharacterCard
+                    key={character.name}
                     name={character.name}
                     birthYear={character.birth_year}
                     height={character.height}

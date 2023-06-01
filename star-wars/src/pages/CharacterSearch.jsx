@@ -1,39 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import SearchBar from '../components/SearchBar';
 import CharacterCard from '../components/CharacterCard';
 
 export default function CharacterSearch() {
-    const [search, setSearch] = useState("")
+    // grabs search term from url
+    const { search } = useParams()
+    console.log(search)
+    const [searchTerm, setSearchTerm] = useState(search || "")
     const [character, setCharacter] = useState({})
+    console.log(searchTerm)
+    const navigate = useNavigate()
+
+    // runs data fetch for initial query and new query if search term changes
+    useEffect(() => {
+        if (search) {
+            // update search term state variable to match search term from url
+            setSearchTerm(search)
+            const url = `https://swapi.dev/api/people/?search=${search}`
+            console.log(searchTerm)
+
+            axios.get(url)
+                .then(res => {
+                    console.log(res.data.results[0])
+                    const fetchedCharacter = res.data.results[0]
+                    console.log(fetchedCharacter)
+                    // state variable is updated with character data
+                    setCharacter(fetchedCharacter || {})
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    }, [search])
 
     // runs query for specific character search based on user input
-    function handleSearch() {
-        const url = `https://swapi.dev/api/people/?search=${search}`
-
-        axios.get(url)
-            .then(res => {
-                const fetchedCharacter = res.data.results[0]
-                // state variable is set to empty object if no character is found
-                setCharacter(fetchedCharacter || {})
-            })
-            .catch(err => {
-                console.log(err)
-            })
+    function handleSearch(event) {
+        event.preventDefault()
+        // update url to match search term
+        navigate(`/character/${searchTerm}`)
     }
 
     function handleChange(event) {
-        setSearch(event.target.value)
+        setSearchTerm(event.target.value)
+    }
+
+    function handleClick() {
+        navigate("/")
     }
 
     return (
         <div>
-            {/* TODO: Set up routing logic */}
-            <button>Back to Home</button> 
+            <button onClick={handleClick} >Back to Home</button>
             <SearchBar
                 onChange={handleChange}
                 onSearch={handleSearch}
-                search={search}
+                search={searchTerm}
             />
             {character ? (
                 <CharacterCard
