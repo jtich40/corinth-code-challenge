@@ -15,24 +15,66 @@ export default function CharacterSearch() {
 
     // runs data fetch for initial query and new query if search term changes
     useEffect(() => {
-        if (search) {
-            // update search term state variable to match search term from url
-            setSearchTerm(search)
-            const url = `https://swapi.dev/api/people/?search=${search}`
-            console.log(searchTerm)
+        if (!search) return
+        // update search term state variable to match search term from url
+        setSearchTerm(search)
+        const url = `https://swapi.dev/api/people/?search=${search}`
+        console.log(searchTerm)
 
-            axios.get(url)
-                .then(res => {
-                    console.log(res.data.results[0])
-                    const fetchedCharacter = res.data.results[0]
-                    console.log(fetchedCharacter)
-                    // state variable is updated with character data
-                    setCharacter(fetchedCharacter || {})
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        }
+        axios.get(url)
+            .then(res => {
+                console.log(res.data.results[0])
+                if (!res.data.results.length) {
+                    setCharacter(null)
+                    return
+                }
+                const fetchedCharacter = res.data.results[0]
+
+                // define urls for homeworld, species, films, and starships
+                const homeworldUrl = fetchedCharacter.homeworld
+                const speciesUrl = fetchedCharacter.species
+                const filmUrls = fetchedCharacter.films
+                const starshipUrls = fetchedCharacter.starships
+
+                // fetch data for homeworld, species, films, and starships
+                const fetchedHomeworld = axios.get(homeworldUrl)
+                // set species to 'Human' if speciesUrl is empty
+                const fetchedSpecies = speciesUrl.length ? (
+                    axios.get(speciesUrl)
+                ) : Promise.resolve({ data: { name: 'Human' } })
+
+                const fetchedFilms = filmUrls.map(url => axios.get(url))
+                // set starships to 'None' if starshipUrls is empty
+                const fetchedStarships = starshipUrls.length ? (
+                    starshipUrls.map(url => axios.get(url))
+                ) : [Promise.resolve({ data: { name: 'None' } })]
+
+                // wait for all promises to resolve
+                Promise.allSettled([
+                    fetchedHomeworld,
+                    fetchedSpecies,
+                    ...fetchedFilms,
+                    ...fetchedStarships
+                ])
+                    .then(res => {
+                        console.log(res)
+                        // update fetchedCharacter object with homeworld, species, films, and starships
+                        fetchedCharacter.homeworld = res[0].value.data.name
+                        fetchedCharacter.species = res[1].value.data.name
+                        // slice res array to access only potential films
+                        fetchedCharacter.films = res.slice(2, 2 + filmUrls.length).map(film => film.value.data.title)
+                        // slice res array to only access potential starships
+                        fetchedCharacter.starships = res.slice(2 + filmUrls.length).map(starship => starship.value.data.name)
+
+                        console.log(fetchedCharacter)
+                        // state variable is updated with all character data
+                        setCharacter(fetchedCharacter || {})
+                    })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
     }, [search])
 
     // runs query for specific character search based on user input
@@ -68,6 +110,7 @@ export default function CharacterSearch() {
                     species={character.species}
                     films={character.films}
                     starships={character.starships}
+                    homeworld={character.homeworld}
                 />
             ) : <h3>No character found, please try again!</h3>
             }

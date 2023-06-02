@@ -8,7 +8,8 @@ export default function CharacterCard({
     hairColor,
     species,
     films,
-    starships
+    starships,
+    homeworld
 }) {
     console.log(name)
     return (
@@ -17,12 +18,13 @@ export default function CharacterCard({
             <img src="" alt="character" />
             <div>
                 <h3>Height: {height} cm </h3>
-                <h3>Mass: {mass} kg </h3>
+                <h3>Weight: {mass} kg </h3>
                 <h3>Hair Color: {hairColor} </h3>
-                <h3>DOB: {birthYear} </h3>
+                <h3>Date of Birth: {birthYear} </h3>
                 <h3>Species: {species} </h3>
-                <h3>Cameos: {films} </h3>
-                <h3>Starships: {starships} </h3>
+                <h3>Appearances: {films} </h3>
+                <h3>Starships Piloted: {starships} </h3>
+                <h3>Homeworld: {homeworld} </h3>
             </div>
         </div>
     )
