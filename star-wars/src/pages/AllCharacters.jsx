@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchBar from '../components/SearchBar';
-import CharacterCard from '../components/CharacterCard';
+import CharacterList from '../components/CharacterList';
 
 export default function AllCharacters() {
     const [search, setSearch] = useState("")
     const [characters, setCharacters] = useState([])
+    const [nextUrl, setNextUrl] = useState("")
     const navigate = useNavigate()
+    const allCharactersUrl = "https://swapi.dev/api/people/"
 
     // fetches data for all characters once component mounts
     useEffect(() => {
-        handleAllCharacters()
+        console.log("useEffect is being called")
+        handleAllCharacters(allCharactersUrl)
     }, [])
 
     function handleChange(event) {
@@ -27,14 +30,17 @@ export default function AllCharacters() {
     }
 
     // fetches data for all characters
-    function handleAllCharacters() {
-        const allCharactersUrl = "https://swapi.dev/api/people/"
-
-        axios.get(allCharactersUrl)
+    function handleAllCharacters(url) {
+        axios.get(url)
             .then(res => {
+                console.log(res.data)
                 const fetchedCharacters = res.data.results
-                // set state variable to array of all characters
-                setCharacters(fetchedCharacters)
+                // only 
+                setCharacters(prevCharacters => ( 
+                    prevCharacters.length === 0 ? fetchedCharacters : [...prevCharacters, ...fetchedCharacters]
+                    ))
+                // update state variable nextUrl to include new url of characters
+                setNextUrl(res.data.next)
             })
             .catch(err => {
                 console.log(err)
@@ -49,20 +55,12 @@ export default function AllCharacters() {
                 search={search}
             />
             {characters.map(character => (
-                <CharacterCard
+                <CharacterList
                     key={character.name}
                     name={character.name}
-                    birthYear={character.birth_year}
-                    height={character.height}
-                    mass={character.mass}
-                    hairColor={character.hair_color}
-                    species={character.species}
-                    films={character.films}
-                    starships={character.starships}
-
                 />
             ))}
-            <button>Show More</button>
+            {nextUrl && <button onClick={() => handleAllCharacters(nextUrl)}>Show More</button>}
         </div>
     )
 }
