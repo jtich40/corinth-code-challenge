@@ -11,7 +11,7 @@ export default function CharacterCard({
     starships,
     homeworld
 }) {
-    console.log(name)
+
     return (
         <div>
             <h1>{name}</h1>

@@ -1,87 +1,118 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
+
 import SearchBar from '../components/SearchBar';
 import CharacterCard from '../components/CharacterCard';
 
 export default function CharacterSearch() {
     // grabs search term from url
     const { search } = useParams()
-    console.log(search)
     const [searchTerm, setSearchTerm] = useState(search || "")
-    const [character, setCharacter] = useState({})
-    console.log(searchTerm)
+    const [queryTerm, setQueryTerm] = useState(search || "")
     const navigate = useNavigate()
 
-    // runs data fetch for initial query and new query if search term changes
-    useEffect(() => {
+    const findCharacter = async (search) => {
         if (!search) return
-        // update search term state variable to match search term from url
-        setSearchTerm(search)
         const url = `https://swapi.dev/api/people/?search=${search}`
-        console.log(searchTerm)
+        const res = await axios.get(url)
+        // if character is not found, throw error
+        if (res.data.results.length === 0) {
+            throw new Error("The dark side clouds everything. Impossible to see, the character is...")
+        }
+        return res.data.results[0]
+    }
 
-        axios.get(url)
-            .then(res => {
-                console.log(res.data.results[0])
-                if (!res.data.results.length) {
-                    setCharacter(null)
-                    return
-                }
-                const fetchedCharacter = res.data.results[0]
+    const findDataByUrl = async (url) => {
+        const res = await axios.get(url)
+        return res.data
+    }
 
-                // define urls for homeworld, species, films, and starships
-                const homeworldUrl = fetchedCharacter.homeworld
-                const speciesUrl = fetchedCharacter.species
-                const filmUrls = fetchedCharacter.films
-                const starshipUrls = fetchedCharacter.starships
-
-                // fetch data for homeworld, species, films, and starships
-                const fetchedHomeworld = axios.get(homeworldUrl)
-                // set species to 'Human' if speciesUrl is empty
-                const fetchedSpecies = speciesUrl.length ? (
-                    axios.get(speciesUrl)
-                ) : Promise.resolve({ data: { name: 'Human' } })
-
-                const fetchedFilms = filmUrls.map(url => axios.get(url))
-                // set starships to 'None' if starshipUrls is empty
-                const fetchedStarships = starshipUrls.length ? (
-                    starshipUrls.map(url => axios.get(url))
-                ) : [Promise.resolve({ data: { name: 'None' } })]
-
-                // wait for all promises to resolve
-                Promise.allSettled([
-                    fetchedHomeworld,
-                    fetchedSpecies,
-                    ...fetchedFilms,
-                    ...fetchedStarships
-                ])
-                    .then(res => {
-                        console.log(res)
-                        // update fetchedCharacter object with homeworld, species, films, and starships
-                        fetchedCharacter.homeworld = res[0].value.data.name
-                        fetchedCharacter.species = res[1].value.data.name
-                        // slice res array to access only potential films
-                        fetchedCharacter.films = res.slice(2, 2 + filmUrls.length).map(film => film.value.data.title)
-                        // slice res array to only access potential starships
-                        fetchedCharacter.starships = res.slice(2 + filmUrls.length).map(starship => starship.value.data.name)
-
-                        console.log(fetchedCharacter)
-                        // state variable is updated with all character data
-                        setCharacter(fetchedCharacter || {})
-                    })
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-    }, [search])
+    // query to fetch data for a single character based on search
+    const {
+        data: character,
+        error: characterError,
+        isLoading: characterLoading,
+        isError,
+        status: characterStatus
+    } = useQuery({
+        queryKey: ['character', queryTerm],
+        queryFn: () => findCharacter(queryTerm),
+        enabled: !!queryTerm,
+    })
+    // query to fetch data for character's homeworld
+    const {
+        data: homeworld,
+        isLoading: homeworldLoading,
+        status: homeworldStatus,
+    } = useQuery({
+        queryKey: ['homeworld', character?.homeworld],
+        queryFn: () => findDataByUrl(character.homeworld),
+        // transform data to only return name
+        select: data => data.name,
+        enabled: !!character
+    })
+    // only run query if character has species
+    const {
+        data: species,
+        isLoading: speciesLoading,
+        status: speciesStatus,
+    } = useQuery({
+        queryKey: ['species', character?.species[0]],
+        queryFn: () => findDataByUrl(character.species[0]),
+        // transform data to only return name
+        select: data => data.name,
+        enabled: !!character && !!character.species.length
+    })
+    // query to fetch data for character's films
+    const {
+        data: films,
+        isLoading: filmsLoading,
+        status: filmsStatus,
+    } = useQuery({
+        queryKey: ['films', character?.films],
+        queryFn: () => Promise.all(character.films.map(findDataByUrl)),
+        // transform data to map over films and return each film title
+        select: data => data.map(film => film.title).join(", "),
+        enabled: !!character
+    })
+    // only run query if character has starships
+    const {
+        data: starships,
+        isLoading: starshipsLoading,
+        status: starshipsStatus,
+    } = useQuery({
+        queryKey: ['starships', character?.starships],
+        queryFn: () => Promise.all(character.starships.map(findDataByUrl)),
+        // transform data to map over starships and return each starship name
+        select: data => data.map(starship => starship.name).join(", "),
+        enabled: !!character && !!character.starships.length
+    })
+    // loading state for all queries
+    const dataLoading = (
+        characterLoading ||
+        homeworldLoading ||
+        (character?.species.length > 0 && speciesLoading) ||
+        filmsLoading ||
+        (character?.starships.length > 0 && starshipsLoading)
+    )
+    // success state for all queries
+    const characterData = (
+        characterStatus === 'success' &&
+        homeworldStatus === 'success' &&
+        (!character.species.length || speciesStatus === 'success') &&
+        (!character.starships.length || starshipsStatus === 'success') &&
+        filmsStatus === 'success'
+    )
 
     // runs query for specific character search based on user input
     function handleSearch(event) {
         event.preventDefault()
         // update url to match search term
         navigate(`/character/${searchTerm}`)
+        // update query to match search term for new searches
+        setQueryTerm(searchTerm)
     }
 
     function handleChange(event) {
@@ -100,19 +131,23 @@ export default function CharacterSearch() {
                 onSearch={handleSearch}
                 search={searchTerm}
             />
-            {character ? (
+            {isError ? (
+                <h3>{characterError.message}</h3>
+            ) : dataLoading ? (
+                <h3>Using the Force to search the galaxy...</h3>
+            ) : characterData && (
                 <CharacterCard
                     name={character.name}
                     birthYear={character.birth_year}
                     height={character.height}
                     mass={character.mass}
                     hairColor={character.hair_color}
-                    species={character.species}
-                    films={character.films}
-                    starships={character.starships}
-                    homeworld={character.homeworld}
+                    species={species || 'Human'}
+                    films={films}
+                    starships={starships || 'None'}
+                    homeworld={homeworld}
                 />
-            ) : <h3>No character found, please try again!</h3>
+            )
             }
         </div>
     )
