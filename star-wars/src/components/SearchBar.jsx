@@ -7,13 +7,14 @@ export default function SearchBar({ onSearch, onChange, search }) {
             <label>
                 <input
                     type="text"
-                    placeholder="Enter Star Wars character here"
+                    placeholder="Enter search here..."
                     name="search"
                     value={search}
                     onChange={onChange}
+                    className="input input-bordered w-full max-w-xs"
                 />
             </label>
-            <button type="submit">Search</button>
+            <button type="submit" className="btn btn-warning ml-2">Search</button>
         </form>
     )
 }

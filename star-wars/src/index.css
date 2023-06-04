@@ -1,4 +1,17 @@
-:root {
+@import url('https://fonts.cdnfonts.com/css/sf-distant-galaxy');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* * {
+  box-sizing: border-box;
+} */
+
+body {
+  font-family: 'SF Distant Galaxy', sans-serif;
+}
+
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -66,4 +79,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

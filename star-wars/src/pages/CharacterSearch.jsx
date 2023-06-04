@@ -125,30 +125,36 @@ export default function CharacterSearch() {
 
     return (
         <div>
-            <button onClick={handleClick} >Back to Home</button>
-            <SearchBar
-                onChange={handleChange}
-                onSearch={handleSearch}
-                search={searchTerm}
-            />
+           
             {isError ? (
                 <h3>{characterError.message}</h3>
             ) : dataLoading ? (
                 <h3>Using the Force to search the galaxy...</h3>
             ) : characterData && (
-                <CharacterCard
-                    name={character.name}
-                    birthYear={character.birth_year}
-                    height={character.height}
-                    mass={character.mass}
-                    hairColor={character.hair_color}
-                    species={species || 'Human'}
-                    films={films}
-                    starships={starships || 'None'}
-                    homeworld={homeworld}
-                />
-            )
+                <div>
+                    <div className="flex justify-start">
+                        <button onClick={handleClick} className="btn btn-warning mb-10" >Back to Home</button>
+                    </div>
+                    <h1 className="mb-5" >Much to learn, you still have. Search again, you must.</h1>
+                    <SearchBar
+                        onChange={handleChange}
+                        onSearch={handleSearch}
+                        search={searchTerm}
+                    />
+                    <CharacterCard
+                        name={character.name}
+                        birthYear={character.birth_year}
+                        height={character.height}
+                        mass={character.mass}
+                        hairColor={character.hair_color}
+                        species={species || 'Human'}
+                        films={films}
+                        starships={starships || 'None'}
+                        homeworld={homeworld}
+                    />
+                    </div>
+                        )
             }
-        </div>
-    )
+                    </div>
+                    )
 }

@@ -24,16 +24,34 @@ export default function Home() {
     }
 
     return (
-        <div>
-            <h1>Star Wars Search</h1>
-            <div>Hero here</div>
-            <h3>Search for your favorite Star Wars character below!</h3>
-            <SearchBar
-                onChange={handleChange}
-                onSearch={handleSearch}
-                search={search}
-            />
-            <button onClick={handleClick} >View All Characters</button>
+        <div className="home-root" >
+            <div className="hero home min-h-screen" style={{ backgroundImage: `url("/images/hyperspace.gif")` }}>
+                <div className="hero-overlay bg-opacity-60"></div>
+                <div className="hero-content text-center text-neutral-content">
+                    <div className="max-w-md">
+                        <h1 className="mb-5 text-6xl text-warning ">May the Search Be with You!</h1>
+                        <p className="mb-5 text-2xl text-warning ">Knowledge is the path to the Force. Type a Star Wars character's name and begin your quest!</p>
+                        <SearchBar
+                            onChange={handleChange}
+                            onSearch={handleSearch}
+                            search={search}
+                        />
+                        <button onClick={handleClick} className="btn btn-warning mt-5" >View All Characters</button>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
+        // <div>
+        //     <h1>Star Wars Search</h1>
+        //     <div>Hero here</div>
+        //     <h3>Search for your favorite Star Wars character below!</h3>
+        //     <SearchBar
+        //         onChange={handleChange}
+        //         onSearch={handleSearch}
+        //         search={search}
+        //     />
+        //     <button onClick={handleClick} >View All Characters</button>
+        // </div>
+

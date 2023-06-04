@@ -14,6 +14,7 @@ export default function AllCharacters() {
     // fetches data for all characters by starting at root url and paginating
     const findCharacters = async ({ pageParam = url }) => {
         const res = await axios.get(pageParam)
+        console.log(res.data)
         return res.data
     }
 
@@ -54,22 +55,33 @@ export default function AllCharacters() {
         }
     }
 
+    function handleClick() {
+        navigate("/")
+    }
+
     return (
         <div>
+            <div className="flex justify-start">
+                <button onClick={handleClick} className="btn btn-warning mb-10" >Back to Home</button>
+            </div>
+            <h1 className="mb-5" >Search your feelings. You know the character to type below.</h1>
             <SearchBar
                 onChange={handleChange}
                 onSearch={handleSearch}
                 search={search}
             />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {characters.map(character => (
                 <CharacterList
                     key={character.name}
                     name={character.name}
                 />
             ))}
+            </div>
             <button
                 onClick={() => fetchNextPage()}
                 disabled={!hasNextPage || isFetchingNextPage}
+                className="btn btn-warning mt-8"
             >
                 {isFetchingNextPage ? 'Loading more...' : 'Show More'}
             </button>
