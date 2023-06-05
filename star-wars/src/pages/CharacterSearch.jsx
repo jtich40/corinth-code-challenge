@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import SearchBar from '../components/SearchBar';
 import CharacterCard from '../components/CharacterCard';
+import HomeButton from '../components/HomeButton';
 
 export default function CharacterSearch() {
     // grabs search term from url
@@ -119,22 +120,21 @@ export default function CharacterSearch() {
         setSearchTerm(event.target.value)
     }
 
-    function handleClick() {
-        navigate("/")
-    }
-
     return (
         <div>
-           
+
             {isError ? (
-                <h3>{characterError.message}</h3>
+                <div className="flex justify-center items-center h-screen">
+                    <h3>{characterError.message}</h3>
+                </div>
             ) : dataLoading ? (
-                <h3>Using the Force to search the galaxy...</h3>
+                <div className="flex flex-col justify-center items-center h-screen space-y-6">
+                    <span className="loading loading-spinner text-primary"></span>
+                    <h3> Using the Force to search the galaxy...</h3>
+                </div>
             ) : characterData && (
                 <div>
-                    <div className="flex justify-start">
-                        <button onClick={handleClick} className="btn btn-warning mb-10" >Back to Home</button>
-                    </div>
+                    <HomeButton />
                     <h1 className="mb-5" >Much to learn, you still have. Search again, you must.</h1>
                     <SearchBar
                         onChange={handleChange}
@@ -152,9 +152,9 @@ export default function CharacterSearch() {
                         starships={starships || 'None'}
                         homeworld={homeworld}
                     />
-                    </div>
-                        )
+                </div>
+            )
             }
-                    </div>
-                    )
+        </div>
+    )
 }

@@ -7,6 +7,7 @@ import './App.css'
 import Home from './pages/Home'
 import CharacterSearch from './pages/CharacterSearch'
 import AllCharacters from './pages/AllCharacters'
+import ThemeToggler from './components/ThemeToggler'
 
 const queryClient = new QueryClient()
 
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <ThemeToggler />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/character/:search" element={<CharacterSearch />} />
