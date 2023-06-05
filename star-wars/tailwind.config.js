@@ -8,6 +8,8 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
+    // set darkTheme config to another theme name so the user's OS dark theme doesn't activate the dark theme
+    darkTheme: 'light',
     themes: [
       {
         light: {
