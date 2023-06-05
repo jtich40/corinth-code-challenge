@@ -1,4 +1,4 @@
-
+This is Jared Tichacek's submission for the Lifeway IT coding challenge. Thanks for checking it out! Images were provided by https://starwars-visualguide.com/
 ---
 
 This is LifeWay IT's code challenge given to full stack software engineering candidates! Interested in working with our team? Check out open positions [here](http://tech.lifeway.com/)
