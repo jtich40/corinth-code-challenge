@@ -15,7 +15,7 @@ export default function CharacterCard({
     return (
         <div className="mt-14">
             <h1 className=" mb-8 text-4xl">{name}</h1>
-            <div className="flex flex-col lg:flex-row justify-between items-center" >
+            <div className="flex flex-col lg:flex-row justify-around items-center" >
                 <img
                     src={`/images/${name}.jpg`}
                     alt={name}

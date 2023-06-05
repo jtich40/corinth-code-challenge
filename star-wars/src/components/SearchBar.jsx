@@ -11,7 +11,7 @@ export default function SearchBar({ onSearch, onChange, search }) {
                     name="search"
                     value={search}
                     onChange={onChange}
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs text-primary"
                 />
             </label>
             <button type="submit" className="btn btn-primary ml-2">Search</button>

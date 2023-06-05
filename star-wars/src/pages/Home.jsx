@@ -24,13 +24,13 @@ export default function Home() {
     }
 
     return (
-        <div className="home-root" >
-            <div className="hero home min-h-screen" style={{ backgroundImage: `url("/images/hyperspace.gif")` }}>
+        <div className="home-background" >
+            <div className="hero home min-h-screen">
                 <div className="hero-overlay bg-opacity-60"></div>
                 <div className="hero-content text-center text-neutral-content">
                     <div className="max-w-md">
                         <h1 className="mb-5 text-6xl text-primary ">May the Search Be with You!</h1>
-                        <p className="mb-5 text-2xl text-primary ">Knowledge is the path to the Force. Type a Star Wars character's name and begin your quest!</p>
+                        <p className="mb-5 text-xl text-primary ">Knowledge is the path to the Force. Type a Star Wars character's name and begin your quest!</p>
                         <SearchBar
                             onChange={handleChange}
                             onSearch={handleSearch}

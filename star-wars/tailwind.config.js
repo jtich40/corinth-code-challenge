@@ -13,7 +13,7 @@ export default {
         light: {
           ...require("daisyui/src/theming/themes")["[data-theme=light]"],
           "primary": "#facc15",
-          "primary-content": "#422006"
+          "primary-content": "#422006",
         },
       },
       {

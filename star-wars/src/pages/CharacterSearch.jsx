@@ -122,10 +122,15 @@ export default function CharacterSearch() {
 
     return (
         <div>
-
             {isError ? (
-                <div className="flex justify-center items-center h-screen">
-                    <h3>{characterError.message}</h3>
+                <div className="flex flex-col justify-center items-center h-screen">
+                    <HomeButton />
+                    <h3 className="mb-5">{characterError.message}</h3>
+                    <SearchBar
+                        onChange={handleChange}
+                        onSearch={handleSearch}
+                        search={searchTerm}
+                    />
                 </div>
             ) : dataLoading ? (
                 <div className="flex flex-col justify-center items-center h-screen space-y-6">
